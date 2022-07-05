@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    class Graph {
+      constructor() {
+        this.vertexes = [];  // 顶点集合
+        this.edges = new Map();   // 边 集合
+      }
+      // 方法
+      // 1. 添加顶点
+      addVertex(v) {
+        this.vertexes.push(v);
+        this.edges.set(v, []);
+      }
+      // 2. 添加边
+      addEdge(v1, v2) {
+        this.edges.get(v1).push(v2);
+        this.edges.get(v2).push(v1);
+      }
+
+      // 3. toString() 方法
+      toString() {
+        let resString = '';
+        // 遍历所有顶点及顶点对应的边
+        for (let i = 0; i < this.vertexes.length; i++) {
+          resString += this.vertexes[i] + '->';
+          const vEdges = this.edges.get(this.vertexes[i]);
+          for (let j = 0; j < vEdges.length; j++) {
+            resString += vEdges[j] + ' ';
+          }
+          resString += '\n';
+        }
+        return resString;
+      }
+
+      // 4.1 初始化状态颜色
+      initializeColor() {
+        let colors = [];
+        for (let i = 0; i < this.vertexes.length; i++) {
+          colors[this.vertexes[i]] = 'white';
+        }
+        return colors;
+      }
+
+      // 4.2 广度优先搜索-BFS
+      bfs(initV) {
+        // 1. 初始化颜色
+        let colors = this.initializeColor();
+        // 2. 创建一个 queue，用 数组实现
+        let queue = [];
+        // 3. 顶点进入队列，定义最终返回的字符串形式的结果
+        queue.push(initV);
+
+        let res = '';
+
+        // 4. 循环从队列中取出元素
+        while (queue.length) {
+          // 弹出队列首元素
+          let v = queue.shift();
+          // 获取与 v 相连的所有其余的未访问过的顶点
+          let vList = this.edges.get(v);
+          // 将 v 的颜色设置为 灰色
+          colors[v] = 'gray';
+          // 遍历 v 所有的顶点，加入到队列中
+          for (let i = 0; i < vList.length; i++) {
+            let e = vList[i];
+            if (colors[e] === 'white') {
+              colors[e] = 'gray';
+              queue.push(e);
+            }
+          }
+          // 访问顶点
+          // function handler(v) {
+          res += v + ' ';
+          // };
+          // handler(v);
+          // 访问完毕，v设为黑色
+          colors[v] = 'black';
+        }
+        return res;
+      }
+
+      // 4.3 深度优先搜索-DFS
+      dfs(initV, handler) {
+        let res = '';
+        // 1. 初始化颜色
+        let colors = this.initializeColor();
+        // 2. 从某个顶点开始依次递归访问
+        this.dfsVisit(initV, colors, handler);
+
+      }
+
+      dfsVisit(v, colors, handler) {
+        // 1. v顶点颜色设置为灰色
+        colors[v] = 'gray';
+        // 2. 处理 v 顶点
+        handler(v);
+        // 3. 访问 v 相连的顶点
+        let vList = this.edges.get(v);
+        for (let i = 0; i < vList.length; i++) {
+          let e = vList[i];
+          if (colors[e] === 'white') {
+            this.dfsVisit(e, colors, handler);
+          }
+        }
+        // 4. v顶点颜色设置为黑色
+        colors[v] = 'black';
+      }
+    }
+
+    // 测试
+    let graph = new Graph();
+    let myVertexes = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
+    for (let i = 0; i < myVertexes.length; i++) {
+      graph.addVertex(myVertexes[i]);
+    }
+    graph.addEdge('A', 'B');
+    graph.addEdge('A', 'C');
+    graph.addEdge('A', 'D');
+    graph.addEdge('C', 'D');
+    graph.addEdge('C', 'G');
+    graph.addEdge('D', 'G');
+    graph.addEdge('D', 'H');
+    graph.addEdge('B', 'E');
+    graph.addEdge('B', 'F');
+    graph.addEdge('E', 'I');
+    console.log(graph.toString());
+
+    alert(graph);
+
+    // 测试 bfs
+    console.log(graph.bfs(graph.vertexes[0]));
+
+    // 测试 dfs
+    let res = '';
+    graph.dfs(graph.vertexes[0], function (v) {
+      res += v + ' ';
+    });
+    console.log(res);
+
+
+
+
+  </script>
+
+</body>
+
+</html>
